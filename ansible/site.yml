@@ -1,0 +1,17 @@
+---
+- name: Configure server
+  hosts: web
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+    - name: Run container
+      docker_container:
+        name: app
+        image: devops-app
+        state: started
+        ports:
+          - "80:80"
