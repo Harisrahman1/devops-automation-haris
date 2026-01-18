@@ -1,0 +1,12 @@
+- name: Deploy landing page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Health check - HTTP 200 on localhost
+  ansible.builtin.uri:
+    url: http://127.0.0.1/
+    status_code: 200

@@ -1,0 +1,6 @@
+admin_username: devopsadmin
+disable_password_auth: true
+disable_root_login: true
+
+app_title: "Evolving Ltd - Automated Deployment"
+app_message: "Provisioned with Terraform + configured with Ansible"

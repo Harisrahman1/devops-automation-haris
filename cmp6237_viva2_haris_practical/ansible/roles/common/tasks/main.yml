@@ -1,0 +1,66 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade packages
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - git
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+    state: present
+
+- name: Ensure UFW allows OpenSSH
+  ansible.builtin.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Ensure UFW allows HTTP
+  ansible.builtin.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Enable UFW
+  ansible.builtin.ufw:
+    state: enabled
+    policy: deny
+
+- name: Create admin user
+  ansible.builtin.user:
+    name: "{{ admin_username }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+
+- name: Harden SSH - disable root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: "PermitRootLogin {{ 'no' if disable_root_login else 'prohibit-password' }}"
+  notify: restart ssh
+
+- name: Harden SSH - disable password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: "PasswordAuthentication {{ 'no' if disable_password_auth else 'yes' }}"
+  notify: restart ssh
+
+- name: Enable unattended upgrades (basic)
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: "0644"

@@ -1,0 +1,6 @@
+# Copy to terraform/terraform.tfvars and set your values
+key_name   = "YOUR_EC2_KEYPAIR_NAME"
+aws_region = "eu-west-2"
+
+# Strongly recommended: lock SSH down to your IP/32
+# ssh_cidr  = "X.X.X.X/32"
